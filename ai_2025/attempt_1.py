@@ -10,80 +10,14 @@ from openai.types.chat import ChatCompletion, ChatCompletionMessage
 from openai.types.chat.chat_completion import Choice
 from pydantic import BaseModel
 
+from common import *
 
-class CallCost(BaseModel):
-    prompt_tokens: int
-    completion_tokens: int
-
-    @staticmethod
-    def from_response(response):
-        u: CompletionUsage = response.usage
-        return CallCost(prompt_tokens=u.prompt_tokens, completion_tokens=u.completion_tokens)
-
-# HELPERS
-
-def call_model(api_key: str, base_url: str, model_name: str, messages: list[dict]) -> tuple[str, CallCost]:
-    client = OpenAI(api_key=api_key, base_url=base_url)
-    logger.info(f'calling {model_name}')
-    res = client.chat.completions.create(model=model_name, messages=messages)
-    content = res.choices[0].message.content
-    cost = CallCost.from_response(res)
-    return content, cost
-
-
-def content_to_structure(content: str, structure_key: str = 'answer'):
-    cleaned_content = re.sub(r'```json\s*|\s*```', '', content).strip()
-    try:
-        xx = json.loads(cleaned_content)
-    except ValueError:
-        logger.error(f'not json-parseable: {content}')
-        raise RuntimeError('Error parsing JSON')
-    try:
-        answer = xx[structure_key]
-    except KeyError:
-        logger.error(f'structure key {structure_key} not found in answer')
-        raise RuntimeError(f'structure key {structure_key} not found in answer')
-    return answer
 
 # PROMPTS
 
-def cities_prompt():
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a concise assistant. Provide responses in a structured JSON format. "
-                       "Return only a JSON object with proper keys"
-        },
-        {
-            "role": "user",
-            "content": "What are the most interesting cities in China? return _only_ a python object with key 'cities' containing the list with city names"
-        }
-    ]
-    return messages
-
-
-def ttt_prompt():
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a concise assistant. Provide responses in a structured JSON format. "
-                       "Return only a JSON object with proper keys"
-        },
-        {
-            "role": "user",
-            "content": """The following tic-tac-toe board is given:
-.o.
-.x.
-...
-
-next move is 'x', and it is your move, make a good move, print the board after the move. Return _only_ the  json structure with key "board". """
-        }
-    ]
-    return messages
-
 # APIs
 
-def call_grok_api():
+def call_grok_api(prompt, required_key: str):
     load_dotenv()
     KEY = os.getenv("XAI_KEY")
     logger.warning(f'{KEY}')
@@ -95,14 +29,15 @@ def call_grok_api():
 
     content, usage = call_model(api_key=KEY, base_url="https://api.x.ai/v1",
                                 model_name="grok-2-1212",
-                                messages=ttt_prompt())
+                                messages=prompt)
 
-    cities = content_to_structure(content, structure_key='board')
-    logger.info(f'cities:\n{cities}')
+    answer = content_to_structure(content, structure_key=required_key)
+    logger.info(f'answer:\n{answer}')
     logger.info(f'usage: {usage}')
+    return answer
 
 
-def call_gemini_api():
+def call_gemini_api(prompt: list[dict], required_key: str):
     load_dotenv()
     KEY = os.getenv("GEMINI_KEY")
     if KEY is None:
@@ -115,11 +50,12 @@ def call_gemini_api():
 
     content, usage = call_model(api_key=KEY, base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
                                 model_name="gemini-2.0-flash",
-                                messages=ttt_prompt())
+                                messages=prompt)
 
-    cities = content_to_structure(content, structure_key='board')
-    logger.info(f'cities:\n{cities}')
+    answer = content_to_structure(content, structure_key=required_key)
+    logger.info(f'answer:\n{answer}')
     logger.info(f'usage: {usage}')
+    return answer
 
 
 def call_anthropic_api():
@@ -180,6 +116,7 @@ def call_sonar_api():
     logger.info(f'usage: {usage}')
 
     # YOUR_API_KEY = "pplx-"  #insert your perplexity token here... if you have one....
+
 
 #     # Initialize the client
 #     client = OpenAI(api_key=KEY, base_url="https://api.perplexity.ai")
@@ -260,7 +197,10 @@ citations=['https://www.englishclub.com/kids/numbers-chart.php', 'https://www.yo
 """
 
 if __name__ == '__main__':
+    prompt = prompt_for_json('What is the capital of Myanmar?', required_key='capital')
+
     # call_sonar_api()
-    call_grok_api()
-    # call_gemini_api()
+    # zz = call_grok_api(prompt, required_key='capital')
+    zz = call_gemini_api(prompt, required_key='capital')
     # call_anthropic_api()
+    print(zz)
