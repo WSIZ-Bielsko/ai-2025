@@ -1,6 +1,8 @@
 import json
+import os
 import re
 
+from dotenv import load_dotenv
 from loguru import logger
 from openai import OpenAI
 from openai.types import CompletionUsage
@@ -8,6 +10,13 @@ from pydantic import BaseModel
 
 
 # MODEL
+
+
+class AI_Model(BaseModel):
+    name: str
+    model_name: str
+    base_url: str
+    key_name: str
 
 
 class CallCost(BaseModel):
@@ -18,6 +27,36 @@ class CallCost(BaseModel):
     def from_response(response):
         u: CompletionUsage = response.usage
         return CallCost(prompt_tokens=u.prompt_tokens, completion_tokens=u.completion_tokens)
+
+
+AI_MODELS: dict[str, AI_Model] = {
+    "gemini": AI_Model(
+        name="gemini",
+        model_name="gemini-2.0-flash",
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        key_name="GEMINI_KEY"
+    ),
+    "grok": AI_Model(
+        name="grok",
+        base_url="https://api.x.ai/v1",
+        model_name="grok-2-1212",
+        key_name="XAI_KEY"
+    ),
+    "sonar": AI_Model(
+        name="sonar",
+        base_url="https://api.perplexity.ai",
+        model_name="sonar",
+        key_name="PPLX_KEY"
+    ),
+    "claude": AI_Model(
+        name="claude",
+        base_url="https://api.anthropic.com/v1",
+        model_name="claude-3-7-sonnet-20250219",
+        key_name="ANTHROPIC_KEY"
+    )
+}
+
+
 
 
 # HELPERS
@@ -46,6 +85,23 @@ def content_to_structure(content: str, structure_key: str = 'answer'):
         logger.error(f'structure key {structure_key} not found in answer')
         raise RuntimeError(f'structure key {structure_key} not found in answer')
     return answer
+
+
+def call_ai_model(model_name: str, prompt: list[dict], required_key: str):
+    load_dotenv()
+
+    config = AI_MODELS[model_name]
+    key = os.getenv(config.key_name)
+
+    content, usage = call_model(
+        api_key=key,
+        base_url=config.base_url,
+        model_name=config.model_name,
+        messages=prompt
+    )
+
+    answer = content_to_structure(content, structure_key=required_key)
+    return answer, usage
 
 
 # PROMPTS

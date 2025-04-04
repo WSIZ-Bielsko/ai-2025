@@ -3,6 +3,7 @@
 prompt_token/output_token (per million)
 
 ```
+grok-beta
 grok-2-1212:  2/10
 grok-3(?): 3.5/10.5
 
@@ -13,6 +14,7 @@ sonar: 1/1
 sonar-pro: 3/15
 
 gemini-2.0-flash: 0/0 
+gemini-2.5-pro-exp-03-25: 0/0
 
 
 https://openai.com/api/pricing/
