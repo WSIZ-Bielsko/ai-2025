@@ -5,7 +5,7 @@ prompt_token/output_token (per million)
 ```
 grok-beta
 grok-2-1212:  2/10
-grok-3(?): 3.5/10.5
+grok-3-beta: 3/15
 
 claude-3-7-sonnet-20250219: 3/15
 claude-3-5-haiku-20241022: 1/5

@@ -39,7 +39,8 @@ AI_MODELS: dict[str, AI_Model] = {
     "grok": AI_Model(
         name="grok",
         base_url="https://api.x.ai/v1",
-        model_name="grok-2-1212",
+        # model_name="grok-2-1212",
+        model_name="grok-3-beta",
         key_name="XAI_KEY"
     ),
     "sonar": AI_Model(
@@ -53,7 +54,20 @@ AI_MODELS: dict[str, AI_Model] = {
         base_url="https://api.anthropic.com/v1",
         model_name="claude-3-7-sonnet-20250219",
         key_name="ANTHROPIC_KEY"
-    )
+    ),
+    "qwen": AI_Model(
+        name="qwen",
+        base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+        model_name="qwen-max",   #qwen-max, qwen-plus, qwq-plus
+        key_name="QWEN_KEY"
+    ),
+    # "qwq": AI_Model(
+    #     name="qwen-qwq",
+    #     base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+    #     model_name="qwq-plus",  # qwen-max, qwq-plus
+    #     key_name="QWEN_KEY"
+    # )
+
 }
 
 
@@ -77,7 +91,7 @@ def content_to_structure(content: str, structure_key: str = 'answer'):
     try:
         xx = json.loads(cleaned_content)
     except ValueError:
-        logger.error(f'not json-parseable: {content}')
+        logger.error(f'not json-parseable: [{content}]')
         raise RuntimeError('Error parsing JSON')
     try:
         answer = xx[structure_key]
@@ -142,6 +156,12 @@ next move is 'x', and it is your move, make a good move, print the board after t
 
 
 def prompt_for_json(message: str, required_key: str) -> list[dict]:
+    """
+    Creates a openai prompt that explicitly calls for returning only a JSON object with the only key `required_key`.
+    :param message:
+    :param required_key:
+    :return:
+    """
     messages = [
         {
             "role": "system",
