@@ -27,17 +27,17 @@ def challenge_ai_model(challenge_data: ChallengeData, model_name: str) -> AiChal
         return AiChallengeScore(score=0, format_error=1)
 
 
-def challenge_1(model_name: str) -> AiChallengeScore:
+def challenge_myanmar(model_name: str) -> AiChallengeScore:
     ch = ChallengeData(prompt='What is capital of Myanmar?', true_answers=['Naypyidaw'])
     return challenge_ai_model(ch, model_name)
 
 
-def challenge_2(model_name: str) -> AiChallengeScore:
+def challenge_inequality(model_name: str) -> AiChallengeScore:
     ch = ChallengeData(prompt="if a<b and c<d is it always true, that a-d < b-c ? Answer with Yes or No", true_answers=['Yes'])
     return challenge_ai_model(ch, model_name)
 
 
-def challenge_x(model_name: str) -> AiChallengeScore:
+def challenge_brasil(model_name: str) -> AiChallengeScore:
     task = "What's the current capital of Brasil"
     answers = ["Brasília", "Brasilia"]
     ch = ChallengeData(prompt=task, true_answers=answers)
@@ -124,14 +124,25 @@ def challenge_pirates(model_name: str) -> AiChallengeScore:
     ch = ChallengeData(prompt=task, true_answers=answers)
     return challenge_ai_model(ch, model_name)
 
+def run_all_challenges(model_name: str):
+    all_challenges = [challenge_myanmar, challenge_inequality, challenge_ttt, challenge_drupal_11_long,
+                      challenge_today, challenge_sentiment, challenge_ddos,
+                      challenge_ssn, challenge_medicine, challenge_python_db, challenge_pirates]
+    for ch in all_challenges:
+        logger.warning(f'running {model_name} on {str(ch).split(" ")[1]}')
+        x = ch(model_name)
+        logger.info(f'result: {x}')
 
 if __name__ == '__main__':
     # model = 'sonar'  # 'grok', 'gemini', 'claude', 'sonar'
     # model = 'grok'
     # model = 'gemini'
 
-    # for model in ['sonar']:
-    for model in AI_MODELS.keys():
-        logger.warning(f'challenging {model}')
-        x = challenge_ttt(model)
-        logger.info(f'result: {x}')
+
+    # for model in ['gpt']:
+    # for model in AI_MODELS.keys():
+    #     logger.warning(f'challenging {model}')
+    #     x = challenge_ttt(model)
+    #     logger.info(f'result: {x}')
+
+    run_all_challenges('gpt')

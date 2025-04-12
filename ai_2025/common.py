@@ -67,6 +67,14 @@ AI_MODELS: dict[str, AI_Model] = {
     #     model_name="qwq-plus",  # qwen-max, qwq-plus
     #     key_name="QWEN_KEY"
     # )
+    "gpt": AI_Model(
+        name="gpt",
+        base_url="https://api.openai.com/v1/",
+        # model_name="gpt-4o-mini",
+        model_name="gpt-4o",  #
+        # model_name="gpt-4.5-preview-2025-02-27",  # beware, $$$; check 4o first
+        key_name="GPT_KEY"
+    ),
 
 }
 
