@@ -45,12 +45,9 @@ def challenge_x(model_name: str) -> AiChallengeScore:
 
 
 def challenge_ttt(model_name: str) -> AiChallengeScore:
-    task = """The following tic-tac-toe board is given:
-.ox
-.x.
-...
-
-next move is 'x', and it is your move, make a good move so as to win the game. Report your answer as a tuple (row, column), numbering them from 1 to 3."""
+    task = """The following tic-tac-toe board is given: ['oox','.x.','...'] (rows from top to bottom, with '.' denoting empty spaces).
+    Next move is 'x', and it is your move, make a good move so as to win the game. 
+    Report your answer as a tuple (row, column), numbering them from 1 to 3."""
     answers = ['(3,1)', '(3, 1)', '[3, 1]', '[3,1]']
     ch = ChallengeData(prompt=task, true_answers=answers)
     return challenge_ai_model(ch, model_name)
@@ -93,7 +90,8 @@ def challenge_ssn(model_name: str) -> AiChallengeScore:
 
 def challenge_medicine(model_name: str) -> AiChallengeScore:
     ch = ChallengeData(
-        prompt="In a patient with a serum creatinine of 2.5 mg/dL and an estimated glomerular filtration rate (eGFR) of 28 mL/min/1.73 m², what is the stage of chronic kidney disease (CKD)? Answer with a single number.",
+        prompt="In a patient with a serum creatinine of 2.5 mg/dL and an estimated glomerular filtration rate (eGFR) of 28 mL/min/1.73 m², "
+               "what is the stage of chronic kidney disease (CKD)? Answer with a single number.",
         true_answers=['4']
     )
     return challenge_ai_model(ch, model_name)
@@ -120,13 +118,20 @@ def challenge_python_db(model_name: str) -> AiChallengeScore:
     return challenge_ai_model(ch, model_name)
 
 
+def challenge_pirates(model_name: str) -> AiChallengeScore:
+    task = """Is "curse of the grey pearl" the name of the first part of the pirates of the caribbean movie series? Answer with Yes or No"""
+    answers = ['No']
+    ch = ChallengeData(prompt=task, true_answers=answers)
+    return challenge_ai_model(ch, model_name)
+
+
 if __name__ == '__main__':
     # model = 'sonar'  # 'grok', 'gemini', 'claude', 'sonar'
     # model = 'grok'
     # model = 'gemini'
 
-    # for model in AI_MODELS.keys():
-    for model in ['gemini']:
+    # for model in ['sonar']:
+    for model in AI_MODELS.keys():
         logger.warning(f'challenging {model}')
-        x = challenge_python_db(model)
+        x = challenge_ttt(model)
         logger.info(f'result: {x}')
