@@ -124,6 +124,27 @@ def challenge_pirates(model_name: str) -> AiChallengeScore:
     ch = ChallengeData(prompt=task, true_answers=answers)
     return challenge_ai_model(ch, model_name)
 
+
+def challenge_find_isolated_numbers(model_name: str) -> AiChallengeScore:
+    task = """Which elements of the list w=[1, 2, 7, 7, 3, 2, 1, 10] appear in this list only once? Answer with a python list."""
+    answers = ["[3, 10]", "[3,10]"]
+    ch = ChallengeData(prompt=task, true_answers=answers)
+    return challenge_ai_model(ch, model_name)
+
+def challenge_routeros_bpdu_root(model_name: str) -> AiChallengeScore:
+    task = """do mikrotik switches (routeros v 7) always send bpdu's to root ports in normal operation, 
+    or do they rely on other port status monitoring; answer with Yes or No"""
+    answers = ['No']
+    ch = ChallengeData(prompt=task, true_answers=answers)
+    return challenge_ai_model(ch, model_name)
+
+
+def challenge_switch_rstp(model_name: str) -> AiChallengeScore:
+    task = "does TL-SG108E support rstp; will it block some ports in circular setup? Answer Yes or No."
+    answers = ['No']
+    ch = ChallengeData(prompt=task, true_answers=answers)
+    return challenge_ai_model(ch, model_name)
+
 def run_all_challenges(model_name: str):
     all_challenges = [challenge_myanmar, challenge_inequality, challenge_ttt, challenge_drupal_11_long,
                       challenge_today, challenge_sentiment, challenge_ddos,
@@ -133,16 +154,16 @@ def run_all_challenges(model_name: str):
         x = ch(model_name)
         logger.info(f'result: {x}')
 
+
 if __name__ == '__main__':
     # model = 'sonar'  # 'grok', 'gemini', 'claude', 'sonar'
     # model = 'grok'
     # model = 'gemini'
 
-
-    # for model in ['gpt']:
+    for model in ['qwen']:
     # for model in AI_MODELS.keys():
-    #     logger.warning(f'challenging {model}')
-    #     x = challenge_ttt(model)
-    #     logger.info(f'result: {x}')
+        logger.warning(f'challenging {model}')
+        x = challenge_routeros_bpdu_root(model)
+        logger.info(f'result: {x}')
 
-    run_all_challenges('gpt')
+    # run_all_challenges('gpt')

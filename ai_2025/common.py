@@ -32,7 +32,17 @@ class CallCost(BaseModel):
 AI_MODELS: dict[str, AI_Model] = {
     "gemini": AI_Model(
         name="gemini",
-        model_name="gemini-2.0-flash",
+        model_name="gemini-2.5-pro-preview-05-06",
+        # model_name="gemini-2.5-pro-preview-03-25",
+        # model_name="gemini-2.5-pro-exp-03-25",
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        key_name="GEMINI_KEY"
+    ),
+    "gemini-simple": AI_Model(
+        name="gemini",
+        # model_name="gemini-2.0-flash",
+        # model_name="gemini-2.5-flash-preview-04-17",
+        model_name="gemini-2.5-flash-preview-05-20",
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
         key_name="GEMINI_KEY"
     ),
@@ -41,6 +51,12 @@ AI_MODELS: dict[str, AI_Model] = {
         base_url="https://api.x.ai/v1",
         # model_name="grok-2-1212",
         model_name="grok-3-beta",
+        key_name="XAI_KEY"
+    ),
+    "grok-simple": AI_Model(
+        name="grok-simple",
+        base_url="https://api.x.ai/v1",
+        model_name="grok-3-mini-latest",
         key_name="XAI_KEY"
     ),
     "sonar": AI_Model(
@@ -52,33 +68,32 @@ AI_MODELS: dict[str, AI_Model] = {
     "claude": AI_Model(
         name="claude",
         base_url="https://api.anthropic.com/v1",
-        model_name="claude-3-7-sonnet-20250219",
+        # model_name="claude-3-7-sonnet-20250219",
+        model_name="claude-sonnet-4-20250514",
         key_name="ANTHROPIC_KEY"
     ),
     "qwen": AI_Model(
-        name="qwen",
+        name="qwen-max",
         base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-        model_name="qwen-max",   #qwen-max, qwen-plus, qwq-plus
+        model_name="qwen3",  # qwen-max, qwen-plus, qwq-plus
         key_name="QWEN_KEY"
     ),
-    # "qwq": AI_Model(
-    #     name="qwen-qwq",
-    #     base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-    #     model_name="qwq-plus",  # qwen-max, qwq-plus
-    #     key_name="QWEN_KEY"
-    # )
     "gpt": AI_Model(
         name="gpt",
         base_url="https://api.openai.com/v1/",
         # model_name="gpt-4o-mini",
-        model_name="gpt-4o",  #
-        # model_name="gpt-4.5-preview-2025-02-27",  # beware, $$$; check 4o first
+        # model_name="gpt-4o",  #
+        model_name="gpt-4.5-preview-2025-02-27",  # beware, $$$; check 4.1 first
+        key_name="GPT_KEY"
+    ),
+    "gpt-simple": AI_Model(
+        name="gpt-simple",
+        base_url="https://api.openai.com/v1/",
+        model_name="gpt-4.1-2025-04-14",
         key_name="GPT_KEY"
     ),
 
 }
-
-
 
 
 # HELPERS
@@ -128,7 +143,7 @@ def call_ai_model(model_name: str, prompt: list[dict], required_key: str):
 
 # PROMPTS
 
-def cities_prompt():
+def cities_prompt() -> list[dict]:
     messages = [
         {
             "role": "system",
@@ -178,7 +193,7 @@ def prompt_for_json(message: str, required_key: str) -> list[dict]:
         },
         {
             "role": "user",
-            "content": message + f". Return _only_ the  json structure with key `{required_key}`. "
+            "content": message + f". Return _only_ the json structure with key `{required_key}`. "
         }
     ]
     return messages
